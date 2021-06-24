@@ -5,9 +5,113 @@
   <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>WebSocket ハンズオン</title>
+  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+  <title>WebSocket受け渡しテスト</title>
 </head>
 <body>
-  <h1>HTML表示テスト</h1>
+<main class="py-8 px-12 w-96 mx-auto bg-gray-100">
+  <section class="my-4">
+    <div>
+      <span class="text-sm font-bold">WS Status</span>
+      <div class="bg-indigo-200 p-2 mb-2">
+        <span class="websocket-status">null</span>
+      </div>
+    </div>
+  </section>
+  <section class="my-4">
+    <div class="bg-gray-300 p-2 rounded shadow">
+      <div>
+        <input
+            class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
+            id="send-message"
+            type="text"
+            placeholder="メッセージを入力"
+        >
+      </div>
+      <div class="text-right">
+        <button id="send-button" class="py-2 px-4 rounded bg-indigo-600 text-white">
+          メッセージ送信
+        </button>
+      </div>
+    </div>
+  </section>
+  <section class="my-4">
+    <div class="text-sm font-bold">メッセージ一覧</div>
+    <div id="messages">
+    </div>
+  </section>
+</main>
+<script>
+
+// https://qiita.com/n0bisuke/items/cb6216dbb9c3c13a10a8
+const URL = 'ws://localhost:8888/'
+const PROTOCOL = 'ws-sample'
+
+const socket = new WebSocket(URL, PROTOCOL)
+
+// ------------------------------
+// WebSocket イベント
+// ------------------------------
+
+// WebSocket が開通したら発火する
+// socket.onopen = () => {} でも可
+socket.addEventListener('open', (event) => {
+  setWsStatus('Websocket Connection 開始')
+})
+
+// WebSocketサーバ からメッセージを受け取ったら発火する
+// socket.onmessage = () => {} でも可
+socket.addEventListener('message', ({ data }) => {
+  setWsStatus('message: ' + data)
+  appendMessage(data)
+})
+
+// WebSocketサーバ からエラーメッセージを受け取ったら発火する
+// socket.onerror = () => {} でも可
+socket.addEventListener('error', (event) => {
+  setWsStatus('Websocket Connection エラー')
+  console.log('error')
+})
+
+// WebSocket がクローズしたら発火する
+// socket.onclose = () => {} でも可
+socket.addEventListener('close', (event) => {
+  setWsStatus('Websocket Connection 終了')
+  console.log('close')
+})
+
+// ------------------------------
+// WebSocket メソッド
+// ------------------------------
+const sendMessage = (message) => {
+  socket.send(message)
+}
+
+// ------------------------------
+// DOM 操作
+// ------------------------------
+
+const sendMessageEl = document.querySelector('#send-message')
+const sendButtonEl = document.querySelector('#send-button')
+sendButtonEl.addEventListener('click', () => {
+  const message = sendMessageEl.value
+  sendMessage(message)
+  sendMessageEl.value = ''
+})
+
+const setWsStatus = (text) => {
+  const statusEl = document.querySelector('.websocket-status')
+  statusEl.innerHTML = text
+}
+
+const createMessageEl = (text) => {
+  return `<div class="rounded bg-white p-2 mb-2 text text-gray-600">${text}</div>`
+}
+const appendMessage = (text) => {
+  const el = createMessageEl(text)
+  document.querySelector('#messages').insertAdjacentHTML('afterend', el)
+}
+
+</script>
 </body>
 </html>
