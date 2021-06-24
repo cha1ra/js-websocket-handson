@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "hot": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -16,6 +17,7 @@
     "eslint-plugin-promise": "^5.1.0"
   },
   "dependencies": {
+    "nodemon": "^2.0.7",
     "websocket": "^1.0.34"
   }
 }
